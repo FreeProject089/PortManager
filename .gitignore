@@ -1,0 +1,11 @@
+# User requested ignores
+bin/
+obj/
+PublishFinalvRefined1.2/
+
+# Additional standard .NET ignores
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
