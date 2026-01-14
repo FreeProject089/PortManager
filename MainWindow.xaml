@@ -1,0 +1,818 @@
+﻿<Window x:Class="PortManager.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PortManager"
+        mc:Ignorable="d"
+        Title="PortManager Ultimate" Height="700" Width="1100"
+        Background="#181818" Foreground="White"
+        WindowStartupLocation="CenterScreen"
+        FontFamily="Segoe UI"
+        Icon="icon.ico"
+        Closing="Window_Closing">
+
+    <Window.TaskbarItemInfo>
+        <TaskbarItemInfo/>
+    </Window.TaskbarItemInfo>
+    
+    <Window.Resources>
+        <local:StateToColorConverter x:Key="StateToColorConverter"/>
+        <local:EmptyToBoolConverter x:Key="EmptyToBool"/>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+        
+        <!-- Colors -->
+        <SolidColorBrush x:Key="WindowBackground" Color="#181818"/>
+        <SolidColorBrush x:Key="ControlBackground" Color="#252526"/>
+        <SolidColorBrush x:Key="ControlBorder" Color="#3F3F46"/>
+        <SolidColorBrush x:Key="AccentColor" Color="#007ACC"/>
+        <SolidColorBrush x:Key="AccentHover" Color="#1C97EA"/>
+
+        <!-- Button Style -->
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource ControlBackground}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="{StaticResource ControlBorder}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="12,6"/>
+            <Setter Property="Margin" Value="4"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}" 
+                                BorderThickness="{TemplateBinding BorderThickness}" 
+                                CornerRadius="4">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#333333"/>
+                                <Setter TargetName="border" Property="BorderBrush" Value="#555555"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#007ACC"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="border" Property="Opacity" Value="0.5"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+         <!-- Radio Button Style -->
+        <Style TargetType="RadioButton">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Margin" Value="0,0,10,0"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+
+         <!-- CheckBox Style -->
+        <Style TargetType="CheckBox">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+
+        <!-- Tab Item Style -->
+        <Style TargetType="TabItem">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#AAA"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Border x:Name="Border" Padding="20,12" Background="Transparent" BorderThickness="0,0,0,3" BorderBrush="Transparent">
+                            <ContentPresenter ContentSource="Header" TextElement.FontWeight="SemiBold"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource AccentColor}"/>
+                                <Setter Property="Foreground" Value="{StaticResource AccentColor}"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Foreground" Value="White"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- GroupBox Style -->
+        <Style TargetType="GroupBox">
+            <Setter Property="BorderBrush" Value="#444"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Margin" Value="0,0,0,10"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="GroupBox">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Border Grid.Row="0" Background="{StaticResource ControlBackground}" Padding="8,4" CornerRadius="4,4,0,0" BorderThickness="1,1,1,0" BorderBrush="{TemplateBinding BorderBrush}">
+                                <ContentPresenter ContentSource="Header" TextElement.FontWeight="Bold"/>
+                            </Border>
+                            <Border Grid.Row="1" Background="#1E1E1E" Padding="10" BorderThickness="1,0,1,1" BorderBrush="{TemplateBinding BorderBrush}" CornerRadius="0,0,4,4">
+                                <ContentPresenter />
+                            </Border>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Top Bar -->
+        <Border Background="#202020" Padding="15,10" BorderThickness="0,0,0,1" BorderBrush="#333">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal">
+                    <!-- Icon -->
+                    <Border Width="28" Height="28" CornerRadius="14" Margin="0,0,10,0">
+                        <Border.Background>
+                            <ImageBrush ImageSource="/icon.jpg" Stretch="UniformToFill"/>
+                        </Border.Background>
+                    </Border>
+                    
+                    <TextBlock Text="PM" FontSize="18" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
+                    <TextBlock Text="ULTIMATE" FontSize="12" Foreground="{StaticResource AccentColor}" VerticalAlignment="Center" Margin="5,4,0,0" FontWeight="Bold"/>
+                </StackPanel>
+                
+                <StackPanel Orientation="Horizontal" Grid.Column="1" HorizontalAlignment="Right">
+                     <TextBlock Text="Profile:" Foreground="#888" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                     <ComboBox Name="CmbActiveProfile" Width="100" Margin="0,0,20,0" VerticalAlignment="Center" SelectionChanged="CmbActiveProfile_SelectionChanged">
+                         <ComboBoxItem Content="Work"/>
+                         <ComboBoxItem Content="Game"/>
+                         <ComboBoxItem Content="Public"/>
+                     </ComboBox>
+
+                     <Border Background="#222" CornerRadius="15" Padding="12,5" Margin="0,0,10,0">
+                         <StackPanel Orientation="Horizontal">
+                             <TextBlock Text="● " Foreground="#4CAF50" VerticalAlignment="Center" FontSize="10"/>
+                             <TextBlock Name="TxtHeaderIp" Text="0.0.0.0" Foreground="#AAA" FontSize="12" VerticalAlignment="Center"/>
+                         </StackPanel>
+                     </Border>
+                     <Border Background="#222" CornerRadius="15" Padding="12,5">
+                         <TextBlock Name="TxtHeaderHostname" Text="HOSTNAME" Foreground="#AAA" FontSize="12" VerticalAlignment="Center"/>
+                     </Border>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Main Content -->
+        <TabControl x:Name="MainTabs" Grid.Row="1" Background="Transparent" BorderThickness="0" Margin="10">
+            
+            <!-- LOCAL PORTS -->
+            <TabItem Header="LOCAL PORTS">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Border Background="{StaticResource ControlBackground}" CornerRadius="5" Padding="10" Margin="0,0,0,10">
+                        <Grid>
+                            <StackPanel Orientation="Horizontal">
+                                <Button Name="BtnRefreshLocal" Content="⟳ Refresh" Click="BtnRefreshLocal_Click" Width="100"/>
+                                <CheckBox Name="ChkAutoRefresh" Content="Auto-Refresh (1s)" IsChecked="True" Margin="15,0,0,0"/>
+                                <TextBlock Text="🔍" Margin="20,0,5,0" VerticalAlignment="Center" FontSize="14"/>
+                                <TextBox Name="TxtSearch" Width="150" Padding="5,3" Background="#111" Foreground="White" BorderBrush="#444" TextChanged="TxtSearch_TextChanged" ToolTip="Search by port, app name, IP..."/>
+                                <TextBlock Name="TxtStatusLocal" Text="System Ready" Margin="20,0,0,0" VerticalAlignment="Center" Foreground="#888"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                <TextBlock Text="Connections: " VerticalAlignment="Center" Foreground="#555"/>
+                                <TextBlock Name="TxtConnCount" Text="0" Foreground="White" FontWeight="Bold" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <DataGrid Name="GridLocalPorts" Grid.Row="1" AutoGenerateColumns="False" 
+                              Background="#1E1E1E" RowBackground="#1E1E1E" AlternatingRowBackground="#252526"
+                              Foreground="#DDD" BorderBrush="#333" HeadersVisibility="Column"
+                              CanUserAddRows="False" IsReadOnly="True" SelectionMode="Single"
+                              GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#333">
+                        <DataGrid.ColumnHeaderStyle>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="Background" Value="#2D2D30"/>
+                                <Setter Property="Foreground" Value="White"/>
+                                <Setter Property="Padding" Value="10,8"/>
+                                <Setter Property="BorderThickness" Value="0,0,0,2"/>
+                                <Setter Property="BorderBrush" Value="#444"/>
+                                <Setter Property="FontWeight" Value="SemiBold"/>
+                            </Style>
+                        </DataGrid.ColumnHeaderStyle>
+                         <DataGrid.CellStyle>
+                            <Style TargetType="DataGridCell">
+                                <Setter Property="Padding" Value="8,4"/>
+                                <Setter Property="BorderThickness" Value="0"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="DataGridCell">
+                                            <Border Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}">
+                                                <ContentPresenter VerticalAlignment="Center" />
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                                <Style.Triggers>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter Property="Background" Value="#007ACC"/>
+                                        <Setter Property="Foreground" Value="White"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGrid.CellStyle>
+                        
+                        <DataGrid.Resources>
+                            <ContextMenu x:Key="RowMenu">
+                                <MenuItem Header="🔌  Close Port (Kill Process)" Click="MenuClosePort_Click" FontWeight="Bold" Foreground="#FF5252"/>
+                                <MenuItem Header="📁  Open File Location" Click="MenuOpenExplorer_Click"/>
+                                <MenuItem Header="🚫  Kill Process" Click="MenuKillProcess_Click"/>
+                                <Separator/>
+                                <MenuItem Header="📋  Copy Local Address" Click="MenuCopyLocal_Click"/>
+                                <MenuItem Header="📋  Copy Remote Address" Click="MenuCopyRemote_Click"/>
+                                <MenuItem Header="📋  Copy Process Path" Click="MenuCopyPath_Click"/>
+                                <Separator/>
+                                <MenuItem Header="🔍  Identify Service" Click="MenuIdentifyService_Click"/>
+                                <MenuItem Header="🌐  Test External Access" Click="MenuTestExternal_Click"/>
+                            </ContextMenu>
+                        </DataGrid.Resources>
+                        
+                        <DataGrid.RowStyle>
+                            <Style TargetType="DataGridRow">
+                                <Setter Property="ContextMenu" Value="{StaticResource RowMenu}"/>
+                                <Setter Property="Background" Value="#1E1E1E"/>
+                                <Setter Property="Foreground" Value="#DDD"/>
+                                <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                                <Setter Property="BorderBrush" Value="#333"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsSuspicious}" Value="True">
+                                        <Setter Property="Background" Value="#4A1818"/> 
+                                        <Setter Property="Foreground" Value="#FFCBCB"/>
+                                        <Setter Property="ToolTip" Value="{Binding SuspiciousReason}"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGrid.RowStyle>
+
+                        <DataGrid.Columns>
+                            <!-- Alert Column -->
+                            <DataGridTemplateColumn Width="30">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="⚠️" Foreground="Red" FontWeight="Bold" 
+                                                   Visibility="{Binding IsSuspicious, Converter={StaticResource BoolToVis}}" 
+                                                   HorizontalAlignment="Center" ToolTip="{Binding SuspiciousReason}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <DataGridTextColumn Header="PROTO" Binding="{Binding Protocol}" Width="70"/>
+                            <DataGridTextColumn Header="LOCAL IP" Binding="{Binding LocalAddress}" Width="130"/>
+                            <DataGridTextColumn Header="PORT" Binding="{Binding LocalPort}" Width="80" FontWeight="Bold"/>
+                            <DataGridTextColumn Header="REMOTE IP" Binding="{Binding RemoteAddress}" Width="130"/>
+                            <DataGridTextColumn Header="R. PORT" Binding="{Binding RemotePort}" Width="80"/>
+                            <DataGridTextColumn Header="DNS/HOSTNAME" Binding="{Binding RemoteHostname}" Width="150" FontStyle="Italic"/>
+                            <DataGridTextColumn Header="SERVICE" Binding="{Binding ServiceName}" Width="100" Foreground="#FFEB3B"/>
+                            <DataGridTextColumn Header="EXT" Binding="{Binding ExternalStatus}" Width="80">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="FontWeight" Value="Bold"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ExternalStatus}" Value="OPEN">
+                                                <Setter Property="Foreground" Value="#4CAF50"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding ExternalStatus}" Value="CLOSED">
+                                                <Setter Property="Foreground" Value="#F44336"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Header="STATE" Binding="{Binding State}" Width="110">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="{Binding State, Converter={StaticResource StateToColorConverter}}"/>
+                                        <Setter Property="FontWeight" Value="Bold"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Header="PID" Binding="{Binding ProcessId}" Width="70"/>
+                            <DataGridTextColumn Header="PROCESS" Binding="{Binding ProcessName}" Width="160" FontWeight="SemiBold"/>
+                            <DataGridTextColumn Header="PATH" Binding="{Binding ProcessPath}" Width="*"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+
+            <!-- NETWORK SCANNER -->
+            <TabItem Header="NETWORK SCANNER">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Border Background="{StaticResource ControlBackground}" CornerRadius="5" Padding="15" Margin="0,0,0,10">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            
+                            <!-- Row 0: Inputs -->
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                                <StackPanel Margin="0,0,20,0">
+                                    <TextBlock Text="Target:" Foreground="#AAA" Margin="0,0,0,4"/>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBox Name="TxtSubnet" Text="192.168.1." Width="140" Padding="5" Background="#111" Foreground="White" BorderBrush="#444"/>
+                                        <Button Name="BtnScanLocal" Content="🏠 Local" Click="BtnScanLocal_Click" Margin="5,0,0,0" ToolTip="Auto-detect and scan local network" Height="26" Padding="5,0"/>
+                                    </StackPanel>
+                                </StackPanel>
+
+                                <StackPanel Margin="0,0,20,0">
+                                    <TextBlock Text="Scope:" Foreground="#AAA" Margin="0,0,0,4"/>
+                                    <StackPanel Orientation="Horizontal">
+                                        <RadioButton Name="RadioScopeSubnet" Content="Subnet (Range)" IsChecked="True"/>
+                                        <RadioButton Name="RadioScopeSingle" Content="Single IP"/>
+                                    </StackPanel>
+                                </StackPanel>
+
+                                <StackPanel Margin="0,0,20,0">
+                                    <TextBlock Text="Precision:" Foreground="#AAA" Margin="0,0,0,4"/>
+                                    <StackPanel Orientation="Horizontal">
+                                        <RadioButton Name="RadioScanFast" Content="Fast (Common Ports)" IsChecked="True"/>
+                                        <RadioButton Name="RadioScanDeep" Content="Precise (Top 100)"/>
+                                    </StackPanel>
+                                </StackPanel>
+
+                                <Button Name="BtnScan" Content="🚀 START SCAN" Click="BtnScan_Click" Width="120" Height="36" VerticalAlignment="Bottom" Background="#007ACC" BorderBrush="#007ACC" Foreground="White" FontWeight="Bold"/>
+                            </StackPanel>
+
+                            <!-- Row 1: Progress -->
+                            <Grid Grid.Row="1">
+                                <ProgressBar Name="ProgressScan" Height="4" Background="#333" Foreground="#007ACC" IsIndeterminate="True" Visibility="Hidden"/>
+                                <TextBlock Name="TxtScanStatus" Text="Ready to scan." HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-20,0,0" Foreground="#AAA" FontSize="12"/>
+                            </Grid>
+                        </Grid>
+                    </Border>
+
+                    <DataGrid Name="GridNetworkDevices" Grid.Row="1" AutoGenerateColumns="False"
+                              Background="#1E1E1E" RowBackground="#1E1E1E" AlternatingRowBackground="#252526"
+                              Foreground="#DDD" BorderBrush="#333" HeadersVisibility="Column"
+                              CanUserAddRows="False" IsReadOnly="True"
+                              GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#333">
+                         <DataGrid.ColumnHeaderStyle>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="Background" Value="#2D2D30"/>
+                                <Setter Property="Foreground" Value="White"/>
+                                <Setter Property="Padding" Value="10,8"/>
+                                <Setter Property="BorderThickness" Value="0,0,0,2"/>
+                                <Setter Property="BorderBrush" Value="#444"/>
+                            </Style>
+                        </DataGrid.ColumnHeaderStyle>
+                         <DataGrid.CellStyle>
+                            <Style TargetType="DataGridCell">
+                                <Setter Property="Padding" Value="8,4"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="DataGridCell">
+                                            <Border Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}">
+                                                <ContentPresenter VerticalAlignment="Center"/>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                                <Style.Triggers>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter Property="Background" Value="#007ACC"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGrid.CellStyle>
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="IP ADDRESS" Binding="{Binding IpAddress}" Width="140" FontWeight="Bold"/>
+                            <DataGridTextColumn Header="HOSTNAME" Binding="{Binding Hostname}" Width="180"/>
+                            <DataGridTextColumn Header="STATUS" Binding="{Binding Status}" Width="100"/>
+                            <DataGridTextColumn Header="OPEN PORTS" Binding="{Binding OpenPorts}" Width="*"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+
+            <!-- STARTUP MANAGER -->
+            <TabItem Header="STARTUP APPS">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Border Background="{StaticResource ControlBackground}" CornerRadius="5" Padding="15" Margin="0,0,0,10">
+                        <StackPanel Orientation="Horizontal">
+                            <Button Name="BtnRefreshStartup" Content="↻ Reload Startup Items" Click="BtnRefreshStartup_Click" Padding="15,8"/>
+                            <TextBlock Text="Manage programs that launch with Windows." VerticalAlignment="Center" Margin="20,0,0,0" Foreground="#666"/>
+                        </StackPanel>
+                    </Border>
+
+                    <DataGrid Name="GridStartup" Grid.Row="1" AutoGenerateColumns="False"
+                              Background="#1E1E1E" RowBackground="#1E1E1E" AlternatingRowBackground="#252526"
+                              Foreground="#DDD" BorderBrush="#333" HeadersVisibility="Column"
+                              CanUserAddRows="False" IsReadOnly="True"
+                              GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#333">
+                        <DataGrid.ColumnHeaderStyle>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="Background" Value="#2D2D30"/>
+                                <Setter Property="Foreground" Value="White"/>
+                                <Setter Property="Padding" Value="10,8"/>
+                                <Setter Property="BorderThickness" Value="0,0,0,2"/>
+                                <Setter Property="BorderBrush" Value="#444"/>
+                                <Setter Property="FontWeight" Value="SemiBold"/>
+                            </Style>
+                        </DataGrid.ColumnHeaderStyle>
+                        <DataGrid.CellStyle>
+                            <Style TargetType="DataGridCell">
+                                <Setter Property="Padding" Value="8,4"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="DataGridCell">
+                                            <Border Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}">
+                                                <ContentPresenter VerticalAlignment="Center"/>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                                <Style.Triggers>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter Property="Background" Value="#007ACC"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGrid.CellStyle>
+                        <DataGrid.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="📁  Open File Location" Click="MenuStartupOpenFolder_Click"/>
+                                <MenuItem Header="🗑  Remove from Startup" Click="MenuStartupRemove_Click" Foreground="#FF5252"/>
+                            </ContextMenu>
+                        </DataGrid.ContextMenu>
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="NAME" Binding="{Binding Name}" Width="200" FontWeight="Bold"/>
+                            <DataGridTextColumn Header="COMMAND" Binding="{Binding Command}" Width="350"/>
+                            <DataGridTextColumn Header="LOCATION" Binding="{Binding Location}" Width="250">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="#888"/>
+                                        <Setter Property="FontSize" Value="11"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Header="STATUS" Binding="{Binding Status}" Width="*"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+
+             <!-- TOOLS & UTILS -->
+             <TabItem Header="TOOLS &amp; FIREWALL">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Left: Port Listener -->
+                    <StackPanel Margin="0,0,10,0">
+                        <GroupBox Header=" CREATE PORT LISTENER ">
+                            <StackPanel>
+                                <TextBlock Text="Open a temporary port on this machine." Foreground="#888" Margin="0,0,0,10"/>
+                                
+                                <Grid Margin="0,0,0,10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Port:" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                    <TextBox Name="TxtListenPort" Text="8080" Padding="4" Background="#111" Foreground="White" Grid.Column="1"/>
+                                </Grid>
+                                
+                                <Grid Margin="0,0,0,10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Protocol:" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                    <ComboBox Name="CmbProtocol" Grid.Column="1" SelectedIndex="0" Padding="4">
+                                        <ComboBoxItem Content="TCP"/>
+                                        <ComboBoxItem Content="UDP"/>
+                                        <ComboBoxItem Content="TCP &amp; UDP"/>
+                                    </ComboBox>
+                                </Grid>
+
+                                <Grid Margin="0,5,0,0">
+                                    <CheckBox Name="ChkForwardOnly" Content="Forward Only Mode (Don't occupy port)" IsChecked="False" VerticalAlignment="Center" ToolTip="Manages FW/UPnP without occupying the port - allows other apps to use it" Checked="ChkForwardOnly_Checked"/>
+                                </Grid>
+
+                                <Grid Margin="0,5,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <CheckBox Name="ChkAddFirewall" Content="Add Firewall Rule" IsChecked="False" VerticalAlignment="Center"/>
+                                    <TextBox Name="TxtFirewallName" Grid.Column="1" Text="PortManager_Rule" Margin="10,0,0,0" Padding="4" Background="#111" Foreground="#DDD" ToolTip="Name of the Firewall Rule" Visibility="{Binding ElementName=ChkAddFirewall, Path=IsChecked, Converter={StaticResource BoolToVis}}"/> 
+                                </Grid>
+                                <Grid Margin="0,5,0,0">
+                                    <CheckBox Name="ChkUpnp" Content="Map on Router (UPnP)" IsChecked="False" VerticalAlignment="Center" ToolTip="Automatically open port on your Router/Box"/>
+                                </Grid>
+                                <TextBlock Text="* Requires Admin" Foreground="#666" FontSize="10" Margin="0,2,0,15"/>
+
+                                <Button Name="BtnStartListener" Content="▶ Start Listening" Click="BtnStartListener_Click" Background="#2E7D32" BorderBrush="#2E7D32"/>
+                            </StackPanel>
+                        </GroupBox>
+
+                        <GroupBox Header=" ACTIVE LISTENERS (SAVED) ">
+                             <ListBox Name="ListActiveListeners" Height="200" Background="#1E1E1E" Foreground="White" BorderThickness="0">
+                                 <ListBox.ItemContainerStyle>
+                                    <Style TargetType="ListBoxItem">
+                                        <Setter Property="Padding" Value="8"/>
+                                        <Setter Property="Background" Value="#252526"/>
+                                        <Setter Property="Margin" Value="0,0,0,2"/>
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="ListBoxItem">
+                                                    <Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}" CornerRadius="3">
+                                                        <ContentPresenter/>
+                                                    </Border>
+                                                    <ControlTemplate.Triggers>
+                                                        <Trigger Property="IsSelected" Value="True">
+                                                            <Setter Property="Background" Value="#444"/>
+                                                        </Trigger>
+                                                    </ControlTemplate.Triggers>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </ListBox.ItemContainerStyle>
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel>
+                                                <TextBlock Text="{Binding DisplayString}" FontWeight="Bold"/>
+                                                <TextBlock Text="{Binding FirewallStatus}" FontSize="11" Foreground="#AAA"/>
+                                            </StackPanel>
+                                            <Button Content="Stop" Width="60" Height="26" Click="BtnStopListener_Click" Tag="{Binding}" Grid.Column="1" Background="#C62828" BorderBrush="#C62828" FontSize="11"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </GroupBox>
+                    </StackPanel>
+
+                    <!-- Right: Quick Actions / Info -->
+                    <StackPanel Grid.Column="1" Margin="10,0,0,0">
+                         <GroupBox Header=" HELP &amp; INFO ">
+                             <StackPanel>
+                                 <TextBlock Text="• 'Subnet Scan' checks IPs from .1 to .254." TextWrapping="Wrap" Margin="0,0,0,5"/>
+                                 <TextBlock Text="• 'Fast Scan' checks common ports (21, 22, 80, 443, 3389, etc)." TextWrapping="Wrap" Margin="0,0,0,5"/>
+                                 <TextBlock Text="• 'TCP &amp; UDP' mode opens two listeners." TextWrapping="Wrap" Margin="0,0,0,5"/>
+                                 <TextBlock Text="• 'Kill Process' available via Right-Click." TextWrapping="Wrap" Margin="0,0,0,5"/>
+                                 <TextBlock Text="• Modifying Firewall requires Admin rights." TextWrapping="Wrap" Margin="0,0,0,5"/>
+                             </StackPanel>
+                         </GroupBox>
+                        
+                         <Border Background="#333" CornerRadius="5" Padding="15" Margin="0,10,0,0">
+                             <StackPanel>
+                                 <TextBlock Text="Your IP Address:" Foreground="#888"/>
+                                 <TextBox Name="TxtMyIp" Text="Detecting..." IsReadOnly="True" Background="Transparent" BorderThickness="0" Foreground="White" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
+                                 
+                                 <TextBlock Text="Hostname:" Foreground="#888"/>
+                                 <TextBlock Name="TxtMyHostname" Text="Detecting..." Foreground="White" FontWeight="SemiBold"/>
+                             </StackPanel>
+                         </Border>
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+
+            <!-- PROFILES -->
+            <TabItem Header="PROFILES">
+                <Grid Margin="15">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="300"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <GroupBox Header=" YOUR PROFILES " Margin="0,0,10,0">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <ListBox Name="ListProfilesUI" Background="#1E1E1E" Foreground="White" BorderThickness="0" Margin="0,0,0,10" SelectionChanged="ListProfilesUI_SelectionChanged"/>
+                            <StackPanel Grid.Row="1">
+                                <TextBlock Text="New Profile Name:" Foreground="#888" Margin="0,0,0,3"/>
+                                <TextBox Name="TxtNewProfileName" Margin="0,0,0,5" Padding="5"/>
+                                <Button Content="➕ Create Profile" Click="BtnCreateProfile_Click" Padding="5"/>
+                                <Button Content="🗑 Delete Profile" Click="BtnDeleteProfile_Click" Margin="0,5,0,0" Foreground="#FF5252"/>
+                                <Button Content="⬇ Import From Session" Click="BtnImportFromSession_Click" Margin="0,15,0,0" Background="#444"/>
+                            </StackPanel>
+                        </Grid>
+                    </GroupBox>
+                    
+                    <GroupBox Header=" PORTS IN SELECTED PROFILE " Grid.Column="1">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <DataGrid Name="GridProfilePorts" Background="#1E1E1E" Foreground="Black" BorderBrush="#333" HeadersVisibility="Column" AutoGenerateColumns="False" CanUserAddRows="False" CellEditEnding="GridProfilePorts_CellEditEnding">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="PORT" Binding="{Binding Port}" Width="80"/>
+                                    <DataGridTextColumn Header="PROTO" Binding="{Binding Protocol}" Width="80"/>
+                                    <DataGridCheckBoxColumn Header="FWD" Binding="{Binding ForwardOnly}" Width="40"/>
+                                    <DataGridCheckBoxColumn Header="UPNP" Binding="{Binding UpnpEnabled}" Width="50"/>
+                                </DataGrid.Columns>
+                                <DataGrid.RowStyle>
+                                    <Style TargetType="DataGridRow">
+                                        <Setter Property="Background" Value="White"/>
+                                        <Setter Property="Foreground" Value="Black"/>
+                                    </Style>
+                                </DataGrid.RowStyle>
+                            </DataGrid>
+                            
+                            <Border Grid.Row="1" Background="#2D2D30" Padding="10" Margin="0,10,0,0" CornerRadius="5">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="Add Port:" VerticalAlignment="Center" Margin="0,0,10,0" Foreground="White"/>
+                                    <TextBox Name="TxtProfileNewPort" Width="60" Margin="0,0,10,0"/>
+                                    <ComboBox Name="CmbProfileNewProto" Width="80" Margin="0,0,10,0">
+                                        <ComboBoxItem Content="TCP" IsSelected="True"/>
+                                        <ComboBoxItem Content="UDP"/>
+                                        <ComboBoxItem Content="TCP &amp; UDP"/>
+                                    </ComboBox>
+                                    <CheckBox Name="ChkProfileUpnp" Content="UPnP" VerticalAlignment="Center" Margin="0,0,10,0" Foreground="White"/>
+                                    <CheckBox Name="ChkProfileFwd" Content="Fwd Only" VerticalAlignment="Center" Margin="0,0,10,0" Foreground="White"/>
+                                    <Button Content="➕ Add" Click="BtnAddPortToProfile_Click" Width="60"/>
+                                    <Button Content="🗑 Remove" Click="BtnRemovePortFromProfile_Click" Margin="10,0,0,0" Background="#444"/>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                    </GroupBox>
+                </Grid>
+            </TabItem>
+
+             <!-- SERVICES -->
+             <TabItem Header="SERVICES">
+                 <Grid Margin="10">
+                     <Grid.RowDefinitions>
+                         <RowDefinition Height="Auto"/>
+                         <RowDefinition Height="*"/>
+                     </Grid.RowDefinitions>
+                     <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                         <Button Content="🔄 Refresh Services" Click="BtnRefreshServices_Click"/>
+                         <TextBlock Name="TxtServicesCount" Text="0 services detected" VerticalAlignment="Center" Margin="20,0,0,0" Foreground="#888"/>
+                     </StackPanel>
+                     <DataGrid Name="GridServices" Grid.Row="1" Background="#1E1E1E" Foreground="Black" BorderBrush="#333" HeadersVisibility="Column" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True">
+                         <DataGrid.Columns>
+                             <DataGridTextColumn Header="NAME" Binding="{Binding ServiceName}" Width="200"/>
+                             <DataGridTextColumn Header="DISPLAY NAME" Binding="{Binding DisplayName}" Width="300"/>
+                             <DataGridTextColumn Header="STATUS" Binding="{Binding Status}" Width="100"/>
+                         </DataGrid.Columns>
+                         <DataGrid.RowStyle>
+                             <Style TargetType="DataGridRow">
+                                 <Setter Property="Background" Value="White"/>
+                                 <Setter Property="Foreground" Value="Black"/>
+                             </Style>
+                         </DataGrid.RowStyle>
+                     </DataGrid>
+                 </Grid>
+             </TabItem>
+
+             <!-- STATISTICS -->
+             <TabItem Header="STATISTICS">
+                 <Grid Margin="10">
+                     <Grid.RowDefinitions>
+                         <RowDefinition Height="Auto"/>
+                         <RowDefinition Height="*"/>
+                     </Grid.RowDefinitions>
+                     <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                         <Button Name="BtnRefreshStats" Content="🔄 Refresh Stats" Click="BtnRefreshStats_Click"/>
+                         <CheckBox Name="ChkStatsAutoRefresh" Content="Auto-Refresh" VerticalAlignment="Center" Margin="10,0,0,0" Foreground="White"/>
+                         <TextBlock Name="TxtSystemUptime" Text="Uptime: -" VerticalAlignment="Center" Margin="20,0,0,0" Foreground="#00BFFF"/>
+                         <TextBlock Name="TxtGlobalCpu" Text="CPU: -" VerticalAlignment="Center" Margin="20,0,0,0" Foreground="#00BFFF"/>
+                         <TextBlock Name="TxtGlobalRam" Text="RAM: -" VerticalAlignment="Center" Margin="20,0,0,0" Foreground="#00BFFF"/>
+                         <TextBlock Name="TxtGlobalGpu" Text="GPU: -" VerticalAlignment="Center" Margin="20,0,0,0" Foreground="#FF5252"/>
+                         <TextBlock Name="TxtGlobalVram" Text="VRAM: -" VerticalAlignment="Center" Margin="20,0,0,0" Foreground="#FF5252"/>
+                     </StackPanel>
+                     
+                     <DataGrid Name="GridProcessStats" Grid.Row="1" Background="#1E1E1E" Foreground="Black" BorderBrush="#333" HeadersVisibility="Column" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True">
+                         <DataGrid.Columns>
+                             <DataGridTextColumn Header="PID" Binding="{Binding Id}" Width="60"/>
+                             <DataGridTextColumn Header="PROCESS NAME" Binding="{Binding ProcessName}" Width="200"/>
+                             <DataGridTextColumn Header="MEMORY (MB)" Binding="{Binding MemoryMB, StringFormat=N0}" Width="100"/>
+                             <DataGridTextColumn Header="CPU %" Binding="{Binding CpuPercent, StringFormat=N1}" Width="80"/>
+                             <DataGridTextColumn Header="GPU %" Binding="{Binding GpuPercent, StringFormat=N1}" Width="80"/>
+                             <DataGridTextColumn Header="VRAM (MB)" Binding="{Binding VramMB, StringFormat=N0}" Width="100"/>
+                         </DataGrid.Columns>
+                         <DataGrid.RowStyle>
+                             <Style TargetType="DataGridRow">
+                                 <Setter Property="Background" Value="White"/>
+                                 <Setter Property="Foreground" Value="Black"/>
+                             </Style>
+                         </DataGrid.RowStyle>
+                     </DataGrid>
+                 </Grid>
+             </TabItem>
+
+            <TabItem Header="LOGS">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <GroupBox Header=" EVENT LOG " Margin="0,0,0,0">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                                <Button Name="BtnRefreshLogs" Content="🔄 Refresh" Click="BtnRefreshLogs_Click" Width="80" Margin="0,0,10,0"/>
+                                <Button Name="BtnExportLogs" Content="📥 Export CSV" Click="BtnExportLogs_Click" Width="120" Margin="0,0,10,0"/>
+                                <Button Name="BtnClearLogs" Content="🗑 Clear" Click="BtnClearLogs_Click" Width="80"/>
+                            </StackPanel>
+                            <ListBox Name="ListLogs" Grid.Row="1" Background="#1E1E1E" BorderThickness="0" Foreground="#DDD">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border BorderBrush="#333" BorderThickness="0,0,0,1" Padding="5,3">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="45"/>
+                                                    <ColumnDefinition Width="75"/>
+                                                    <ColumnDefinition Width="100"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="{Binding DisplayDate}" Foreground="#444" FontSize="10"/>
+                                                <TextBlock Text="{Binding DisplayTime}" Foreground="#666" Grid.Column="1"/>
+                                                <TextBlock Text="{Binding EventType}" FontWeight="Bold" Grid.Column="2">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Setter Property="Foreground" Value="#888"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Category}" Value="SECURITY">
+                                                                    <Setter Property="Foreground" Value="#FF5252"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding Category}" Value="NETWORK">
+                                                                    <Setter Property="Foreground" Value="#00BFFF"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding Category}" Value="FIREWALL">
+                                                                    <Setter Property="Foreground" Value="#FFA726"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding Category}" Value="SYSTEM">
+                                                                    <Setter Property="Foreground" Value="#4CAF50"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                                <TextBlock Text="{Binding Details}" Foreground="#AAA" Grid.Column="3" TextTrimming="CharacterEllipsis"/>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </Grid>
+                    </GroupBox>
+
+
+                </Grid>
+            </TabItem>
+        </TabControl>
+
+        <!-- Footer -->
+        <StatusBar Grid.Row="2" Background="{StaticResource AccentColor}" Foreground="White" Padding="5,0">
+            <StatusBarItem>
+                <TextBlock Name="TxtGlobalStatus" Text="Ready"/>
+            </StatusBarItem>
+            <StatusBarItem HorizontalAlignment="Right">
+                <TextBlock Text="v1.2 Ultimate" Opacity="0.8"/>
+            </StatusBarItem>
+        </StatusBar>
+    </Grid>
+</Window>

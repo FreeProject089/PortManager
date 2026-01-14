@@ -1,0 +1,33 @@
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Linq;
+using System.Net;
+using System.Net.Sockets;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Threading;
+using System.Windows.Media;
+using System.Windows.Shell;
+using Microsoft.Win32;
+
+// Aliases for WinForms/Drawing to avoid ambiguity
+using NotifyIcon = System.Windows.Forms.NotifyIcon;
+using WinIcon = System.Drawing.Icon;
+using ContextMenuStrip = System.Windows.Forms.ContextMenuStrip;
+using FormsApplication = System.Windows.Forms.Application;
+using WpfMessageBox = System.Windows.MessageBox;
+using WpfApplication = System.Windows.Application;
+using WpfCheckBox = System.Windows.Controls.CheckBox;
+using WpfComboBox = System.Windows.Controls.ComboBox;
+using WpfComboBoxItem = System.Windows.Controls.ComboBoxItem;
+using WpfTextBox = System.Windows.Controls.TextBox;
+using WpfButton = System.Windows.Controls.Button;
+using WpfListBox = System.Windows.Controls.ListBox;
+
+namespace PortManager
+{
+    // ... rest of the file ...
+}
