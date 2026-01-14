@@ -1,8 +1,8 @@
-# PortManager Ultimate
+# PM Ultimate
 
 An advanced Network and Port Management Tool for Windows.
 
-## New Features (v1.1)
+## New Features (v1.2)
 
 - **Precise Network Scanning**:
   - Scan entire Subnets (e.g., 192.168.1.x) or Single IPs.
